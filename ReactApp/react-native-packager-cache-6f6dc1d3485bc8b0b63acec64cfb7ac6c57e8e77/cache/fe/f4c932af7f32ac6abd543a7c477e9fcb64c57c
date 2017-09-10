@@ -1,0 +1,468 @@
+module.exports = function () {
+  "use strict";
+
+  var Meteor = { _noYieldsAllowed: function nope(f) {
+      return f();
+    } };
+  var EJSON,
+      EJSONTest,
+      i,
+      Base64,
+      root = {};
+  var _ = require("underscore");
+
+
+  var BASE_64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+  var BASE_64_VALS = {};
+
+  for (var i = 0; i < BASE_64_CHARS.length; i++) {
+    BASE_64_VALS[BASE_64_CHARS.charAt(i)] = i;
+  };
+
+  Base64 = {};
+
+  Base64.encode = function (array) {
+
+    if (typeof array === "string") {
+      var str = array;
+      array = Base64.newBinary(str.length);
+      for (var i = 0; i < str.length; i++) {
+        var ch = str.charCodeAt(i);
+        if (ch > 0xFF) {
+          throw new Error("Not ascii. Base64.encode can only take ascii strings.");
+        }
+        array[i] = ch;
+      }
+    }
+
+    var answer = [];
+    var a = null;
+    var b = null;
+    var c = null;
+    var d = null;
+    for (var i = 0; i < array.length; i++) {
+      switch (i % 3) {
+        case 0:
+          a = array[i] >> 2 & 0x3F;
+          b = (array[i] & 0x03) << 4;
+          break;
+        case 1:
+          b = b | array[i] >> 4 & 0xF;
+          c = (array[i] & 0xF) << 2;
+          break;
+        case 2:
+          c = c | array[i] >> 6 & 0x03;
+          d = array[i] & 0x3F;
+          answer.push(getChar(a));
+          answer.push(getChar(b));
+          answer.push(getChar(c));
+          answer.push(getChar(d));
+          a = null;
+          b = null;
+          c = null;
+          d = null;
+          break;
+      }
+    }
+    if (a != null) {
+      answer.push(getChar(a));
+      answer.push(getChar(b));
+      if (c == null) answer.push('=');else answer.push(getChar(c));
+      if (d == null) answer.push('=');
+    }
+    return answer.join("");
+  };
+
+  var getChar = function getChar(val) {
+    return BASE_64_CHARS.charAt(val);
+  };
+
+  var getVal = function getVal(ch) {
+    if (ch === '=') {
+      return -1;
+    }
+    return BASE_64_VALS[ch];
+  };
+
+  Base64.newBinary = function (len) {
+    if (typeof Uint8Array === 'undefined' || typeof ArrayBuffer === 'undefined') {
+      var ret = [];
+      for (var i = 0; i < len; i++) {
+        ret.push(0);
+      }
+      ret.$Uint8ArrayPolyfill = true;
+      return ret;
+    }
+    return new Uint8Array(new ArrayBuffer(len));
+  };
+
+  Base64.decode = function (str) {
+    var len = Math.floor(str.length * 3 / 4);
+    if (str.charAt(str.length - 1) == '=') {
+      len--;
+      if (str.charAt(str.length - 2) == '=') len--;
+    }
+    var arr = Base64.newBinary(len);
+
+    var one = null;
+    var two = null;
+    var three = null;
+
+    var j = 0;
+
+    for (var i = 0; i < str.length; i++) {
+      var c = str.charAt(i);
+      var v = getVal(c);
+      switch (i % 4) {
+        case 0:
+          if (v < 0) throw new Error('invalid base64 string');
+          one = v << 2;
+          break;
+        case 1:
+          if (v < 0) throw new Error('invalid base64 string');
+          one = one | v >> 4;
+          arr[j++] = one;
+          two = (v & 0x0F) << 4;
+          break;
+        case 2:
+          if (v >= 0) {
+            two = two | v >> 2;
+            arr[j++] = two;
+            three = (v & 0x03) << 6;
+          }
+          break;
+        case 3:
+          if (v >= 0) {
+            arr[j++] = three | v;
+          }
+          break;
+      }
+    }
+    return arr;
+  };
+
+  EJSON = {};
+  EJSONTest = {};
+
+  var customTypes = {};
+
+  EJSON.addType = function (name, factory) {
+    if (_.has(customTypes, name)) throw new Error("Type " + name + " already present");
+    customTypes[name] = factory;
+  };
+
+  var isInfOrNan = function isInfOrNan(obj) {
+    return _.isNaN(obj) || obj === Infinity || obj === -Infinity;
+  };
+
+  var builtinConverters = [{
+    matchJSONValue: function matchJSONValue(obj) {
+      return _.has(obj, '$date') && _.size(obj) === 1;
+    },
+    matchObject: function matchObject(obj) {
+      return obj instanceof Date;
+    },
+    toJSONValue: function toJSONValue(obj) {
+      return { $date: obj.getTime() };
+    },
+    fromJSONValue: function fromJSONValue(obj) {
+      return new Date(obj.$date);
+    }
+  }, {
+    matchJSONValue: function matchJSONValue(obj) {
+      return _.has(obj, '$InfNaN') && _.size(obj) === 1;
+    },
+    matchObject: isInfOrNan,
+    toJSONValue: function toJSONValue(obj) {
+      var sign;
+      if (_.isNaN(obj)) sign = 0;else if (obj === Infinity) sign = 1;else sign = -1;
+      return { $InfNaN: sign };
+    },
+    fromJSONValue: function fromJSONValue(obj) {
+      return obj.$InfNaN / 0;
+    }
+  }, {
+    matchJSONValue: function matchJSONValue(obj) {
+      return _.has(obj, '$binary') && _.size(obj) === 1;
+    },
+    matchObject: function matchObject(obj) {
+      return typeof Uint8Array !== 'undefined' && obj instanceof Uint8Array || obj && _.has(obj, '$Uint8ArrayPolyfill');
+    },
+    toJSONValue: function toJSONValue(obj) {
+      return { $binary: Base64.encode(obj) };
+    },
+    fromJSONValue: function fromJSONValue(obj) {
+      return Base64.decode(obj.$binary);
+    }
+  }, {
+    matchJSONValue: function matchJSONValue(obj) {
+      return _.has(obj, '$escape') && _.size(obj) === 1;
+    },
+    matchObject: function matchObject(obj) {
+      if (_.isEmpty(obj) || _.size(obj) > 2) {
+        return false;
+      }
+      return _.any(builtinConverters, function (converter) {
+        return converter.matchJSONValue(obj);
+      });
+    },
+    toJSONValue: function toJSONValue(obj) {
+      var newObj = {};
+      _.each(obj, function (value, key) {
+        newObj[key] = EJSON.toJSONValue(value);
+      });
+      return { $escape: newObj };
+    },
+    fromJSONValue: function fromJSONValue(obj) {
+      var newObj = {};
+      _.each(obj.$escape, function (value, key) {
+        newObj[key] = EJSON.fromJSONValue(value);
+      });
+      return newObj;
+    }
+  }, {
+    matchJSONValue: function matchJSONValue(obj) {
+      return _.has(obj, '$type') && _.has(obj, '$value') && _.size(obj) === 2;
+    },
+    matchObject: function matchObject(obj) {
+      return EJSON._isCustomType(obj);
+    },
+    toJSONValue: function toJSONValue(obj) {
+      var jsonValue = Meteor._noYieldsAllowed(function () {
+        return obj.toJSONValue();
+      });
+      return { $type: obj.typeName(), $value: jsonValue };
+    },
+    fromJSONValue: function fromJSONValue(obj) {
+      var typeName = obj.$type;
+      if (!_.has(customTypes, typeName)) throw new Error("Custom EJSON type " + typeName + " is not defined");
+      var converter = customTypes[typeName];
+      return Meteor._noYieldsAllowed(function () {
+        return converter(obj.$value);
+      });
+    }
+  }];
+
+  EJSON._isCustomType = function (obj) {
+    return obj && typeof obj.toJSONValue === 'function' && typeof obj.typeName === 'function' && _.has(customTypes, obj.typeName());
+  };
+
+  var adjustTypesToJSONValue = EJSON._adjustTypesToJSONValue = function (obj) {
+    if (obj === null) return null;
+    var maybeChanged = toJSONValueHelper(obj);
+    if (maybeChanged !== undefined) return maybeChanged;
+
+    if (typeof obj !== 'object') return obj;
+
+    _.each(obj, function (value, key) {
+      if (typeof value !== 'object' && value !== undefined && !isInfOrNan(value)) return;
+
+      var changed = toJSONValueHelper(value);
+      if (changed) {
+        obj[key] = changed;
+        return;
+      }
+
+      adjustTypesToJSONValue(value);
+    });
+    return obj;
+  };
+
+  var toJSONValueHelper = function toJSONValueHelper(item) {
+    for (var i = 0; i < builtinConverters.length; i++) {
+      var converter = builtinConverters[i];
+      if (converter.matchObject(item)) {
+        return converter.toJSONValue(item);
+      }
+    }
+    return undefined;
+  };
+
+  EJSON.toJSONValue = function (item) {
+    var changed = toJSONValueHelper(item);
+    if (changed !== undefined) return changed;
+    if (typeof item === 'object') {
+      item = EJSON.clone(item);
+      adjustTypesToJSONValue(item);
+    }
+    return item;
+  };
+
+  var adjustTypesFromJSONValue = EJSON._adjustTypesFromJSONValue = function (obj) {
+    if (obj === null) return null;
+    var maybeChanged = fromJSONValueHelper(obj);
+    if (maybeChanged !== obj) return maybeChanged;
+
+    if (typeof obj !== 'object') return obj;
+
+    _.each(obj, function (value, key) {
+      if (typeof value === 'object') {
+        var changed = fromJSONValueHelper(value);
+        if (value !== changed) {
+          obj[key] = changed;
+          return;
+        }
+
+        adjustTypesFromJSONValue(value);
+      }
+    });
+    return obj;
+  };
+
+  var fromJSONValueHelper = function fromJSONValueHelper(value) {
+    if (typeof value === 'object' && value !== null) {
+      if (_.size(value) <= 2 && _.all(value, function (v, k) {
+        return typeof k === 'string' && k.substr(0, 1) === '$';
+      })) {
+        for (var i = 0; i < builtinConverters.length; i++) {
+          var converter = builtinConverters[i];
+          if (converter.matchJSONValue(value)) {
+            return converter.fromJSONValue(value);
+          }
+        }
+      }
+    }
+    return value;
+  };
+
+  EJSON.fromJSONValue = function (item) {
+    var changed = fromJSONValueHelper(item);
+    if (changed === item && typeof item === 'object') {
+      item = EJSON.clone(item);
+      adjustTypesFromJSONValue(item);
+      return item;
+    } else {
+      return changed;
+    }
+  };
+
+  EJSON.stringify = function (item, options) {
+    var json = EJSON.toJSONValue(item);
+    if (options && (options.canonical || options.indent)) {
+      return EJSON._canonicalStringify(json, options);
+    } else {
+      return JSON.stringify(json);
+    }
+  };
+
+  EJSON.parse = function (item) {
+    if (typeof item !== 'string') throw new Error("EJSON.parse argument should be a string");
+    return EJSON.fromJSONValue(JSON.parse(item));
+  };
+
+  EJSON.isBinary = function (obj) {
+    return !!(typeof Uint8Array !== 'undefined' && obj instanceof Uint8Array || obj && obj.$Uint8ArrayPolyfill);
+  };
+
+  EJSON.equals = function (a, b, options) {
+    var i;
+    var keyOrderSensitive = !!(options && options.keyOrderSensitive);
+    if (a === b) return true;
+    if (_.isNaN(a) && _.isNaN(b)) return true;
+    if (!a || !b) return false;
+    if (!(typeof a === 'object' && typeof b === 'object')) return false;
+    if (a instanceof Date && b instanceof Date) return a.valueOf() === b.valueOf();
+    if (EJSON.isBinary(a) && EJSON.isBinary(b)) {
+      if (a.length !== b.length) return false;
+      for (i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) return false;
+      }
+      return true;
+    }
+    if (typeof a.equals === 'function') return a.equals(b, options);
+    if (typeof b.equals === 'function') return b.equals(a, options);
+    if (a instanceof Array) {
+      if (!(b instanceof Array)) return false;
+      if (a.length !== b.length) return false;
+      for (i = 0; i < a.length; i++) {
+        if (!EJSON.equals(a[i], b[i], options)) return false;
+      }
+      return true;
+    }
+
+    switch (EJSON._isCustomType(a) + EJSON._isCustomType(b)) {
+      case 1:
+        return false;
+      case 2:
+        return EJSON.equals(EJSON.toJSONValue(a), EJSON.toJSONValue(b));
+    }
+
+    var ret;
+    if (keyOrderSensitive) {
+      var bKeys = [];
+      _.each(b, function (val, x) {
+        bKeys.push(x);
+      });
+      i = 0;
+      ret = _.all(a, function (val, x) {
+        if (i >= bKeys.length) {
+          return false;
+        }
+        if (x !== bKeys[i]) {
+          return false;
+        }
+        if (!EJSON.equals(val, b[bKeys[i]], options)) {
+          return false;
+        }
+        i++;
+        return true;
+      });
+      return ret && i === bKeys.length;
+    } else {
+      i = 0;
+      ret = _.all(a, function (val, key) {
+        if (!_.has(b, key)) {
+          return false;
+        }
+        if (!EJSON.equals(val, b[key], options)) {
+          return false;
+        }
+        i++;
+        return true;
+      });
+      return ret && _.size(b) === i;
+    }
+  };
+
+  EJSON.clone = function (v) {
+    var ret;
+    if (typeof v !== "object") return v;
+    if (v === null) return null;
+    if (v instanceof Date) return new Date(v.getTime());
+
+    if (v instanceof RegExp) return v;
+    if (EJSON.isBinary(v)) {
+      ret = EJSON.newBinary(v.length);
+      for (var i = 0; i < v.length; i++) {
+        ret[i] = v[i];
+      }
+      return ret;
+    }
+
+    if (_.isArray(v) || _.isArguments(v)) {
+      ret = [];
+      for (i = 0; i < v.length; i++) {
+        ret[i] = EJSON.clone(v[i]);
+      }return ret;
+    }
+
+    if (typeof v.clone === 'function') {
+      return v.clone();
+    }
+
+    if (EJSON._isCustomType(v)) {
+      return EJSON.fromJSONValue(EJSON.clone(EJSON.toJSONValue(v)), true);
+    }
+
+    ret = {};
+    _.each(v, function (value, key) {
+      ret[key] = EJSON.clone(value);
+    });
+    return ret;
+  };
+
+  EJSON.newBinary = Base64.newBinary;
+
+  return EJSON;
+}.call(this);
