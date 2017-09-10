@@ -1,3 +1,5 @@
 Random Notes File
 
 meteor npm install --save babel-runtime
+
+changing npm version cmd:  sudo npm install -g npm@4.6
