@@ -1,6 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, TextInput, Slider } from 'react-native';
 
+import CheckBox from 'react-native-checkbox-heaven';
+import Gender from './gender.js'
+
 
 
 
@@ -8,9 +11,9 @@ export default class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { text: 'Useless Placeholder', age: 18 };
-  }
 
+    this.state = { age: 18, checked: false };
+  }
 
   render() {
 
@@ -44,6 +47,9 @@ export default class App extends React.Component {
         <View>
           <Text style={{ color: 'white' }}>{this.state.age}</Text>
         </View>
+
+        <Gender />
+
       </View>
 
     );
