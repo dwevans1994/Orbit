@@ -5,5 +5,5 @@ meteor npm install --save babel-runtime
 changing npm version cmd:  sudo npm install -g npm@4.6
 
 Update react-native version:
-react-native-git-upgrade
 npm install -g react-native-git-upgrade
+react-native-git-upgrade
