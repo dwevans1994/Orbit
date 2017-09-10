@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="911a902a-37c7-4f25-b4c2-41c139573912" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/scala/scrap.sc" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/scrapeClubs$.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/scrapeClubs$.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/scala-2.12/classes/scrapeClubs.class" afterPath="$PROJECT_DIR$/target/scala-2.12/classes/scrapeClubs.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/scrapeClubs.scala" afterPath="$PROJECT_DIR$/src/main/scala/scrapeClubs.scala" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../cleanScrape" afterPath="" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -321,15 +317,16 @@
       <workItem from="1504967248538" duration="468000" />
       <workItem from="1504975588053" duration="1908000" />
       <workItem from="1504980406946" duration="3044000" />
-      <workItem from="1504989328172" duration="9672000" />
+      <workItem from="1504989328172" duration="9851000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="20039000" />
+    <option name="totallyTimeSpent" value="20218000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1280" y="0" width="1366" height="768" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
