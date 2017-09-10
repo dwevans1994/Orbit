@@ -1,9 +1,18 @@
-Random Notes File
+***   Random Notes File   ***
 
-meteor npm install --save babel-runtime
+// meteor npm install 
+--save babel-runtime
 
-changing npm version cmd:  sudo npm install -g npm@4.6
+// changing npm version cmd:  
+sudo npm install -g npm@4.6
 
-Update react-native version:
+// Update react-native version:
 npm install -g react-native-git-upgrade
 react-native-git-upgrade
+
+// Open cmd in project directory
+npm install react-native-checkbox-heaven --save
+// React native vector icons is a dependency so needs to be linked
+npm install rnpm -g
+rnpm link react-native-vector-icons
+// Restart expo project
