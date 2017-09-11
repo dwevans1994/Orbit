@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script>
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-106095202-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-106095202-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments)
+        };
+        gtag('js', new Date());
+
+        gtag('config', 'UA-106095202-1');
+
+    </script>
+
+    <meta charset="UTF-8">
+    <title>Orbit</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="css/img/orbitFavicon.png" type="image/png">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <link rel="stylesheet" href="/css/transitions.css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div id="topBar" class="row">
+            <img id="logo" src="css/img/OrbitFinished.png" alt="Orbit">
+        </div>
+        <div id="mainPage_Render"></div>
+    </div>
+    <div class="container-fluid mainBox">
+        <center>
+            <h1 id="mainTitle" class="fade3">Welcome to Orbit!</h1>
+        </center>
+        <div class="col-sm-6" id="submitted">
+            <center>
+                <h4 class="subTitle sH1 fade4">Orbit’s mission is to shape the perfect night.</h4>
+                <h4 class="subTitle sH2 fade4">Bringing together your pals to enjoy the events Manchester has to offer!</h4>
+                <form id="gform" method="POST" action="https://script.google.com/macros/s/AKfycbynPhicDhng2EJzbEF5IqXpiAl6nTN8b8STtp482UxqKpkcxQ5q/exec">
+                    <div id="inputBox">
+                        <input type="text" id="name" name="name" class="fade55" placeholder="First Name">
+                        <input type="text" id="email" name="emai" class="fade55" placeholder="Email">
+                    </div>
+                    <a onclick="3formSubmit()">
+                        <button class="btn btn-primary" id="button">Submit</button>
+                    </a>
+                </form>
+            </center>
+        </div>
+        <div class="phonePics col-sm-6">
+            <center>
+                <div class="phone"><img src="css/img/Screen%20Shot%202017-09-07%20at%2013.36.15.png" alt="" class="snapShots"></div>
+            </center>
+        </div>
+    </div>
+
+</body>
+
+</html>

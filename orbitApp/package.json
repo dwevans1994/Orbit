@@ -1,0 +1,12 @@
+{
+  "name": "app",
+  "private": true,
+  "scripts": {
+    "start": "meteor run"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.26.0",
+    "ddp-client": "^0.1.1",
+    "meteor-node-stubs": "~0.2.4"
+  }
+}

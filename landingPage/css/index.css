@@ -1,0 +1,161 @@
+* {
+    color: darkslategrey;
+    font-family: 'Open Sans', sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    background: url(img/testBackground.jpg);
+    background-size: cover;
+    background-position: center;
+}
+
+#topBar {
+    height: 120px
+}
+
+#logo {
+    width: 500px;
+    margin: -30px 0px 0px -55px
+}
+
+#mainTitle {
+    font-size: 10vw;
+    margin-bottom: 10px;
+}
+
+.subTitle {
+    margin: 2px;
+    font-size: 3.5vw;
+}
+
+#name {
+    margin-bottom: 6px;
+}
+
+input {
+    width: 65vw;
+    background: rgba(255, 255, 255, 0.6);
+    border: none;
+    margin-top: 3px;
+    height: 25px;
+    border-radius: 8px;
+}
+
+::-webkit-input-placeholder {
+    /* Chrome/Opera/Safari */
+    color: darkslateblue;
+    font-size: 17px;
+    padding-left: 10px;
+}
+
+::-moz-placeholder {
+    /* Firefox 19+ */
+    color: darkslateblue;
+    font-size: 17px;
+    padding-left: 10px;
+}
+
+:-ms-input-placeholder {
+    /* IE 10+ */
+    color: darkslateblue;
+    font-size: 17px;
+    padding-left: 10px;
+}
+
+:-moz-placeholder {
+    /* Firefox 18- */
+    color: darkslateblue;
+    font-size: 17px;
+    padding-left: 10px;
+}
+
+#button {
+    margin-top: 10px;
+    border-radius: 8px;
+    width: 40vw;
+    opacity: .75
+}
+
+#button:hover {
+    opacity: 1;
+}
+
+.sH2 {
+    margin-bottom: 10px;
+}
+
+.phone {
+    background: url(img/smartphone-1557796_1280.png);
+    width: 70vw;
+    background-size: cover;
+    height: 95vw
+}
+
+.snapShots {
+    width: 41.2vw;
+    height: 86.1vw;
+    padding-top: 14.2vw
+}
+
+.phonePics {
+    margin-bottom: 30px;
+}
+
+@media only screen and (min-width: 768px) {
+    input {
+        width: 35vw;
+    }
+    #button {
+        width: 35vw;
+    }
+    form {
+        margin-top: 30px;
+    }
+    .sH1 {
+        margin-top: 20vh;
+    }
+    #topBar {
+        height: 7vh;
+    }
+    .phone {
+        width: 40vw;
+        height: 60vw
+    }
+    .snapShots {
+        width: 24.7vw;
+        margin-left: 2.5vw;
+        height: 52.2vw;
+        padding-top: 8.6vw
+    }
+    #mainTitle {
+        font-size: 7vw;
+    }
+    .subTitle {
+        font-size: 2vw;
+    }
+}
+
+@media only screen and (min-width: 1200px) {
+    .phone {
+        width: 26vw;
+        height: 35.3vw
+    }
+    .snapShots {
+        width: 15.2vw;
+        margin-left: 0.15vw;
+        height: 32vw;
+        padding-top: 5.1vw
+    }
+    #button {
+        width: 30vw;
+    }
+    input {
+        width: 30vw;
+        opacity: .7;
+    }
+    #mainTitle {
+        font-size: 6vw;
+    }
+}
