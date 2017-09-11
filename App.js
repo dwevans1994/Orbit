@@ -1,5 +1,8 @@
 import React from 'react';
+import DDPClient from 'ddp-client';
 import { StyleSheet, Text, View, Image, TextInput, Slider } from 'react-native';
+
+let ddpClient = new DDPClient();
 
 import CheckBox from 'react-native-checkbox-heaven';
 import Gender from './gender.js'
@@ -55,6 +58,15 @@ export default class App extends React.Component {
     );
   }
 }
+
+ componentDidMount() {
+    ddpClient.connect((err, wasReconnect) => {
+      let connected = true;
+      if (err) connected = false;
+
+      this.setState({ connected: connected });
+    });
+  }
 
 const styles = StyleSheet.create({
   container: {
